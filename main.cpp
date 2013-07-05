@@ -16,7 +16,6 @@ int main(int argc, char** argv)
   particleSystem.readParameters(parameterfile);
   particleSystem.testPrintParameters();
   particleSystem.readData(datafile);
-  particleSystem.testPrintData();
-  
+  particleSystem.simulate();
   return 0;
 }

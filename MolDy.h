@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <list>
+#include <vector>
 
 struct Particle{
  double mass;
@@ -10,15 +11,21 @@ struct Particle{
  double v_x;
  double v_y;
  double v_z;
+ double f_x;
+ double f_y;
+ double f_z;
  
- Particle(double _mass=0.0, double _x=0.0, double _y=0.0, double _z =0.0, double _v_x = 0.0, double _v_y = 0.0, double _v_z = 0.0):
+ Particle(double _mass=0.0, double _x=0.0, double _y=0.0, double _z =0.0, double _v_x = 0.0, double _v_y = 0.0, double _v_z = 0.0, double _f_x = 0.0, double _f_y = 0.0, double _f_z = 0.0):
   mass(_mass),
   x(_x),
   y(_y),
   z(_z),
   v_x(_v_x),
   v_y(_v_y),
-  v_z(_v_z){}
+  v_z(_v_z),
+  f_x(_f_x),
+  f_y(_f_y),
+  f_z(_f_z){}
  
 };
 
@@ -26,6 +33,7 @@ class MolDy
 {
   private:
   
+  std::string vtkfile;
   int vis_space;
   double t_start;
   double t_end;
@@ -44,18 +52,43 @@ class MolDy
   double cell_size_y;
   double cell_size_z;
   
+  int cells_x;
+  int cells_y;
+  int cells_z;
+  
+  int number_particles;
+  
   std::list<Particle*> cell;
+  std::vector< std::list<Particle*>* > cells;
   
   public:
   
   MolDy(void){}
   
-  ~MolDy(void){}
+  ~MolDy(void){
+    for(std::vector< std::list<Particle*>* >::iterator it = cells.begin(); it!= cells.end(); ++it)
+    {
+      if(!(*it)->empty())
+      {
+	for(std::list<Particle*>::iterator it2 = (*it)->begin(); it2 != (*it)->end(); ++it2)
+	{
+	  delete (*it2);
+	}
+      }
+      delete (*it);
+    }
+  }
   
   void readParameters(std::string filename);
   void testPrintParameters(void);
   void readData(std::string filename);
-  void testPrintData(void);
+  void testPrintParticles(void);
+  void assignParticle(Particle* particle);
+  void VTKPrint(std::string filename);
+  void updatePosition(void);
+  void updateCell(void);
+  void checkCells(void);
+  void simulate(void);
   
 };
 
