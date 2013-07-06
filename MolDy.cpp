@@ -252,7 +252,7 @@ void MolDy::testPrintParticles(void){
 void MolDy::VTKPrint(std::string filename){
     std::ofstream outfile(filename.c_str());
     if (outfile.good()){
-        outfile<<"# vtk DataFile Version 4.0"<<std::endl;
+        outfile<<"# vtk DataFile Version 3.0"<<std::endl;
         outfile<<"SiwiRVisFile"<<std::endl;
         outfile<<"ASCII"<<std::endl;
         outfile<<"DATASET UNSTRUCTURED_GRID"<<std::endl;
@@ -387,13 +387,13 @@ void MolDy::checkCells(void){
 }
 
 void MolDy::simulate(void){
-  for(double time = t_start; time < t_end; time += delta_t)
+  for(int t = 0; t < ((t_end-t_start)/delta_t); ++t)
   {
     updatePosition();
-    if(static_cast<int>((time-t_start)/delta_t)%vis_space == 0)
+    if(t%vis_space == 0)
     {
       std::stringstream filename;
-      filename << vtkfile << ((time-t_start)/delta_t)/vis_space << ".vtk" << std::endl;
+      filename << vtkfile << t/vis_space << ".vtk";
       VTKPrint(filename.str());
       std::cout << filename.str() << std::endl;
     }
