@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 void MolDy::readParameters(std::string filename){
   std::ifstream infile(filename.c_str());
@@ -310,7 +311,7 @@ void MolDy::updatePosition(void){
   //loop through cells
   for(std::vector< std::list<Particle*>* >::iterator it = cells.begin(); it!= cells.end(); ++it)
   {
-    if(!(*it)->empty())
+    if(!((*it)->empty()))
     { 
       //if cell not empty loop though contents updating positions
       for(std::list<Particle*>::iterator it2 = (*it)->begin(); it2 != (*it)->end(); ++it2)
@@ -384,6 +385,78 @@ void MolDy::checkCells(void){
       }
     }
   }
+}
+
+void MolDy::calculateForces(void){
+  
+  double xDistance;
+  double yDistance;
+  double zDistance;
+  double xForce;
+  double yForce;
+  double zForce;
+  double distance;
+  double forceDistance;
+  double sigmaradius;
+  
+  //loop through cells
+  for(std::vector< std::list<Particle*>* >::iterator it = cells.begin(); it!= cells.end(); ++it)
+  {
+    if(!(*it)->empty())
+    { 
+      
+      for(std::list<Particle*>::iterator it2 = (*it)->begin(); it2 != (*it)->end(); ++it2)
+      {
+	
+	//reset forces to zero
+	(*it2)->f_x += 0.0;
+	(*it2)->f_y += 0.0;
+	(*it2)->f_z += 0.0;
+	
+	//calculate forces from particles in immediate cell
+	for(std::list<Particle*>::iterator it3 = ++it2; it3 !=(*it)->end(); ++it3)
+	{
+	  --it2;
+	  
+	  xDistance = (*it2)->x - (*it3)->x;
+	  yDistance = (*it2)->y - (*it3)->y;
+	  zDistance = (*it2)->z - (*it3)->z;
+	  distance = sqrt(xDistance*xDistance + yDistance*yDistance + zDistance*zDistance);
+	  
+	  if( distance < r_cut)
+	  {
+	    sigmaradius = (sigma/distance);
+	    sigmaradius = sigmaradius*sigmaradius*sigmaradius;
+	    sigmaradius = sigmaradius*sigmaradius;
+	    
+	    forceDistance = 24*epsilon*1/(distance*distance)*(sigmaradius)*(1-2*sigmaradius);
+	    
+	    xForce = forceDistance*xDistance;
+	    yForce = forceDistance*yDistance;
+	    zForce = forceDistance*zDistance;
+	    
+	    (*it2)->f_x += xForce;
+	    (*it2)->f_y += yForce;
+	    (*it2)->f_z += zForce;
+	    
+	    (*it3)->f_x -= xForce;
+	    (*it3)->f_y -= yForce;
+	    (*it3)->f_z -= zForce;
+	  }
+	}
+      }
+    }
+  }
+}
+
+void intercellForces(void)
+{
+  
+}
+
+void adjacentCell(void)
+{
+  
 }
 
 void MolDy::simulate(void){

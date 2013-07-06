@@ -86,6 +86,7 @@ class MolDy
   void assignParticle(Particle* particle);
   void VTKPrint(std::string filename);
   void updatePosition(void);
+  void calculateForces(void);
   void updateCell(void);
   void checkCells(void);
   void simulate(void);
