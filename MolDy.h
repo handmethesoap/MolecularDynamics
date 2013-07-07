@@ -14,8 +14,11 @@ struct Particle{
  double f_x;
  double f_y;
  double f_z;
+ double f_x_prev;
+ double f_y_prev;
+ double f_z_prev;
  
- Particle(double _mass=0.0, double _x=0.0, double _y=0.0, double _z =0.0, double _v_x = 0.0, double _v_y = 0.0, double _v_z = 0.0, double _f_x = 0.0, double _f_y = 0.0, double _f_z = 0.0):
+ Particle(double _mass=0.0, double _x=0.0, double _y=0.0, double _z =0.0, double _v_x = 0.0, double _v_y = 0.0, double _v_z = 0.0, double _f_x = 0.0, double _f_y = 0.0, double _f_z = 0.0, double _f_x_prev = 0.0, double _f_y_prev = 0.0, double _f_z_prev = 0.0):
   mass(_mass),
   x(_x),
   y(_y),
@@ -25,7 +28,10 @@ struct Particle{
   v_z(_v_z),
   f_x(_f_x),
   f_y(_f_y),
-  f_z(_f_z){}
+  f_z(_f_z),
+  f_x_prev(_f_x_prev),
+  f_y_prev(_f_y_prev),
+  f_z_prev(_f_z_prev){}
  
 };
 
@@ -83,13 +89,22 @@ class MolDy
   void testPrintParameters(void);
   void readData(std::string filename);
   void testPrintParticles(void);
+  
   void assignParticle(Particle* particle);
+  
   void VTKPrint(std::string filename);
+  
   void updatePosition(void);
   void calculateForces(void);
+  void updateVelocities(void);
+  
   void updateCell(void);
   void checkCells(void);
+  int adjacentCell(int x_offset, int y_offset, int z_offset, int vector_index);
+  void intercellForces(std::list<Particle*>::iterator particle, std::vector< std::list<Particle*>* >::iterator adjacent_cell);
+  
   void simulate(void);
+  
   
 };
 

@@ -14,7 +14,6 @@ int main(int argc, char** argv)
   MolDy particleSystem;
   
   particleSystem.readParameters(parameterfile);
-  particleSystem.testPrintParameters();
   particleSystem.readData(datafile);
   particleSystem.simulate();
   return 0;
