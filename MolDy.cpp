@@ -112,6 +112,20 @@ void MolDy::readParameters(std::string filename){
 		  return exit(-1);
 	      }
 	  }
+// 	  else if (param == "gravity"){
+// 	      ss>>gravity;
+// 	      if (ss.fail()){
+// 		  std::cerr<<"Error reading 'sigma' in '"<<filename<<"'"<<std::endl;
+// 		  return exit(-1);
+// 	      }
+// 	  }
+// 	  else if (param == "reflective_boundaries"){
+// 	      ss>>reflective_boundaries;
+// 	      if (ss.fail()){
+// 		  std::cerr<<"Error reading 'sigma' in '"<<filename<<"'"<<std::endl;
+// 		  return exit(-1);
+// 	      }
+// 	  }
       }
       infile.close();
   }
@@ -202,17 +216,17 @@ void MolDy::assignParticle(Particle* particle){
   
   //deal with periodic boundaries
   if(particle->x >= x_max)
-    particle->x = particle->x - (x_max - x_min);
+    particle->x = fmod((particle->x), (x_max - x_min));
   if(particle->x < x_min)
-    particle->x = particle->x + (x_max-x_min);
+    particle->x = fmod((particle->x), (x_max-x_min)) + (x_max-x_min);
   if(particle->y >= y_max)
-    particle->y = particle->y - (y_max - y_min);
+    particle->y = fmod((particle->y), (y_max - y_min));
   if(particle->y < y_min)
-    particle->y = particle->y + (y_max-y_min);
+    particle->y = fmod((particle->y), (y_max - y_min)) + (y_max-y_min);
   if(particle->z >= z_max)
-    particle->z = particle->z - (z_max - z_min);
+    particle->z = fmod((particle->z), (z_max - z_min));
   if(particle->z < z_min)
-    particle->z = particle->z + (z_max-z_min);
+    particle->z = fmod((particle->z), (z_max - z_min)) + (z_max-z_min);
   
   //find coordinates of cell for particle
   int x = particle->x/cell_size_x;
@@ -425,10 +439,11 @@ void MolDy::calculateForces(void){
   //loop through cells
   for(std::vector< std::list<Particle*>* >::iterator it = cells.begin(); it!= cells.end(); ++it)
   {
+    
     cell_position = std::distance(cells.begin(), it);
     if(!(*it)->empty())
     { 
-      
+      //std::cout << "cell" << std::endl;
       for(std::list<Particle*>::iterator it2 = (*it)->begin(); it2 != (*it)->end(); ++it2)
       {
 	std::list<Particle*>::iterator it3 = it2;
@@ -438,12 +453,12 @@ void MolDy::calculateForces(void){
 	{
 	  
 	  
-	  xDistance = (*it2)->x - (*it3)->x;
-	  yDistance = (*it2)->y - (*it3)->y;
-	  zDistance = (*it2)->z - (*it3)->z;
+	  xDistance = (*it3)->x - (*it2)->x;
+	  yDistance = (*it3)->y - (*it2)->y;
+	  zDistance = (*it3)->z - (*it2)->z;
 	  //std::cout << (*it2)->x << std::endl;
 	  distance = sqrt(xDistance*xDistance + yDistance*yDistance + zDistance*zDistance);
-	  std::cout<<distance<<std::endl;
+
 	  
 	  if( distance < r_cut)
 	  {
@@ -456,6 +471,8 @@ void MolDy::calculateForces(void){
 	    xForce = forceDistance*xDistance;
 	    yForce = forceDistance*yDistance;
 	    zForce = forceDistance*zDistance;
+	    
+	    //std::cout << "force = " << forceDistance*distance << "; distance = " << distance << "; F(x,y,z) = (" << xForce << ", " << yForce << ", " << zForce << ")" << std::endl;
 	    
 	    (*it2)->f_x += xForce;
 	    (*it2)->f_y += yForce;
@@ -470,20 +487,20 @@ void MolDy::calculateForces(void){
 	//std::cout << cells_x*cells_y*cells_z << " "  << adjacentCell(1,0,0,cell_position) <<  " " << cell_position << std::endl;
 	//std::cout << cell_position/(cells_x*cells_y) << " " << (cell_position%(cells_x*cells_y)/cells_x) << " " << (cell_position%(cells_x*cells_y))%cells_x <<  std::endl;	
 
-// 	intercellForces(it2, it + adjacentCell(1,0,0,cell_position));	
-// 	intercellForces(it2, it + adjacentCell(1,0,-1,cell_position));	
-// 	intercellForces(it2, it + adjacentCell(0,0,-1,cell_position));
-// 	intercellForces(it2, it + adjacentCell(-1,0,-1,cell_position));	
-// 	intercellForces(it2, it + adjacentCell(-1,-1,1,cell_position));
-// 	intercellForces(it2, it + adjacentCell(0,-1,1,cell_position));
-// 	intercellForces(it2, it + adjacentCell(1,-1,1,cell_position));
-// 	intercellForces(it2, it + adjacentCell(-1,-1,0,cell_position));
-// 	intercellForces(it2, it + adjacentCell(0,-1,0,cell_position));
-// 	intercellForces(it2, it + adjacentCell(1,-1,0,cell_position));
-// 	intercellForces(it2, it + adjacentCell(-1,-1,-1,cell_position));
-// 	intercellForces(it2, it + adjacentCell(0,-1,-1,cell_position));	
-// //std::cout<< "13. " << (cell_position + adjacentCell(1,-1,-1,cell_position))/(cells_x*cells_y) << " " << ((cell_position + adjacentCell(1,-1,-1,cell_position))%(cells_x*cells_y)/cells_x) << " " << ((cell_position + adjacentCell(1,-1,-1,cell_position))%(cells_x*cells_y))%cells_x <<  std::endl;
-// 	intercellForces(it2, it + adjacentCell(1,-1,-1,cell_position));
+	intercellForces(it2, it + adjacentCell(1,0,0,cell_position));
+	intercellForces(it2, it + adjacentCell(1,0,-1,cell_position));
+	intercellForces(it2, it + adjacentCell(0,0,-1,cell_position));
+	intercellForces(it2, it + adjacentCell(-1,0,-1,cell_position));	
+	intercellForces(it2, it + adjacentCell(-1,-1,1,cell_position));
+	intercellForces(it2, it + adjacentCell(0,-1,1,cell_position));
+	intercellForces(it2, it + adjacentCell(1,-1,1,cell_position));
+	intercellForces(it2, it + adjacentCell(-1,-1,0,cell_position));
+	intercellForces(it2, it + adjacentCell(0,-1,0,cell_position));
+	intercellForces(it2, it + adjacentCell(1,-1,0,cell_position));
+	intercellForces(it2, it + adjacentCell(-1,-1,-1,cell_position));
+	intercellForces(it2, it + adjacentCell(0,-1,-1,cell_position));	
+//std::cout<< "13. " << (cell_position + adjacentCell(1,-1,-1,cell_position))/(cells_x*cells_y) << " " << ((cell_position + adjacentCell(1,-1,-1,cell_position))%(cells_x*cells_y)/cells_x) << " " << ((cell_position + adjacentCell(1,-1,-1,cell_position))%(cells_x*cells_y))%cells_x <<  std::endl;
+	intercellForces(it2, it + adjacentCell(1,-1,-1,cell_position));
 	//std::cout << "helloend" << std::endl;
       }
     }
@@ -506,9 +523,9 @@ void MolDy::intercellForces(std::list<Particle*>::iterator particle, std::vector
   {
     //std::cout << "hello" << std::endl;  
     //std::cout << "hello2 " << (*particle)->x << std::endl; 
-    xDistance = (*particle)->x - (*it)->x;
-    yDistance = (*particle)->y - (*it)->y;
-    zDistance = (*particle)->z - (*it)->z;
+    xDistance = (*it)->x - (*particle)->x;
+    yDistance = (*it)->y - (*particle)->y;
+    zDistance = (*it)->z - (*particle)->z;
     distance = sqrt(xDistance*xDistance + yDistance*yDistance + zDistance*zDistance);
     
     if( distance < r_cut)
@@ -517,7 +534,7 @@ void MolDy::intercellForces(std::list<Particle*>::iterator particle, std::vector
       sigmaradius = sigmaradius*sigmaradius*sigmaradius;
       sigmaradius = sigmaradius*sigmaradius;
       
-      forceDistance = 24*epsilon*1/(distance*distance)*(sigmaradius)*(1-2*sigmaradius);
+      forceDistance = 24.0*epsilon*(1.0/(distance*distance))*(sigmaradius)*(1.0-2.0*sigmaradius);
       
       xForce = forceDistance*xDistance;
       yForce = forceDistance*yDistance;
@@ -542,7 +559,7 @@ int MolDy::adjacentCell(int x_offset, int y_offset, int z_offset, int vector_ind
   {
     total_offset += (x_offset - cells_x);
   }
-  else if((vector_index + x_offset)/cells_x  < (vector_index)/cells_x)
+  else if(((vector_index + x_offset)/cells_x  < (vector_index)/cells_x) || (vector_index + x_offset) < 0 )
   {
     total_offset += (x_offset + cells_x);
   }
@@ -555,7 +572,7 @@ int MolDy::adjacentCell(int x_offset, int y_offset, int z_offset, int vector_ind
   {
     total_offset += y_offset*cells_x - cells_x*cells_y;
   }
-  else if((vector_index + y_offset*cells_x)/(cells_x*cells_y) < (vector_index)/(cells_x*cells_y))
+  else if((vector_index + y_offset*cells_x)/(cells_x*cells_y) < (vector_index)/(cells_x*cells_y) || (vector_index + y_offset*cells_x) < 0)
   {
     total_offset += y_offset*cells_x + cells_x*cells_y;
   }
@@ -568,7 +585,7 @@ int MolDy::adjacentCell(int x_offset, int y_offset, int z_offset, int vector_ind
   {
     total_offset += z_offset*cells_x*cells_y - cells_x*cells_y*cells_z;
   }
-  else if((vector_index + z_offset*cells_x*cells_y)/(cells_x*cells_y*cells_z) < vector_index/(cells_x*cells_y*cells_z))
+  else if((vector_index + z_offset*cells_x*cells_y)/(cells_x*cells_y*cells_z) < vector_index/(cells_x*cells_y*cells_z) || (vector_index + z_offset*cells_x*cells_y) < 0)
   {
     total_offset += z_offset*cells_x*cells_y + cells_x*cells_y*cells_z;
   }
@@ -589,20 +606,18 @@ void MolDy::updateVelocities(void){
       //if cell not empty loop though contents updating positions
       for(std::list<Particle*>::iterator it2 = (*it)->begin(); it2 != (*it)->end(); ++it2)
       {
-	(*it2)->v_x = (*it2)->v_x + (((*it2)->f_x_prev + (*it2)->f_x)*delta_t)/(2*((*it2)->mass));
-	(*it2)->v_y = (*it2)->v_y + (((*it2)->f_y_prev + (*it2)->f_y)*delta_t)/(2*((*it2)->mass)); 
-	(*it2)->v_z = (*it2)->v_z + (((*it2)->f_z_prev + (*it2)->f_z)*delta_t)/(2*((*it2)->mass));
+	(*it2)->v_x = (*it2)->v_x + (((*it2)->f_x_prev + (*it2)->f_x)*delta_t)/(2.0*((*it2)->mass));
+	(*it2)->v_y = (*it2)->v_y + (((*it2)->f_y_prev + (*it2)->f_y)*delta_t)/(2.0*((*it2)->mass)); 
+	(*it2)->v_z = (*it2)->v_z + (((*it2)->f_z_prev + (*it2)->f_z)*delta_t)/(2.0*((*it2)->mass));
       }
     }
   }
 }
 
 void MolDy::simulate(void){
+  calculateForces();
   for(int t = 0; t < ((t_end-t_start)/delta_t); ++t)
   {
-    updatePosition();
-    calculateForces();
-    updateVelocities();
     if(t%vis_space == 0)
     {
       std::stringstream filename;
@@ -610,6 +625,11 @@ void MolDy::simulate(void){
       VTKPrint(filename.str());
       std::cout << filename.str() << std::endl;
     }
+    
+    updatePosition();
+    calculateForces();
+    updateVelocities();
+    
     //std::cout << time << std::endl;
   }
 }

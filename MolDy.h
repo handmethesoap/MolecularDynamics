@@ -54,6 +54,9 @@ class MolDy
   double epsilon;
   double sigma;
   
+  double gravity;
+  bool reflective_boundaries;
+  
   double cell_size_x;
   double cell_size_y;
   double cell_size_z;
@@ -69,7 +72,11 @@ class MolDy
   
   public:
   
-  MolDy(void){}
+  MolDy(void){
+    gravity = 0.0;
+    reflective_boundaries = 0;
+    
+  }
   
   ~MolDy(void){
     for(std::vector< std::list<Particle*>* >::iterator it = cells.begin(); it!= cells.end(); ++it)
