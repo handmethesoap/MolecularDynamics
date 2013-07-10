@@ -1,7 +1,11 @@
+#ifndef MOLDY
+#define MOLDY
+
 #include <stdlib.h>
 #include <iostream>
 #include <list>
 #include <vector>
+#include "ParameterReader.h"
 
 struct Particle{
  double mass;
@@ -72,11 +76,7 @@ class MolDy
   
   public:
   
-  MolDy(void){
-    gravity = 0.0;
-    reflective_boundaries = 0;
-    
-  }
+  MolDy(const ParameterReader& parameters);
   
   ~MolDy(void){
     for(std::vector< std::list<Particle*>* >::iterator it = cells.begin(); it!= cells.end(); ++it)
@@ -92,7 +92,6 @@ class MolDy
     }
   }
   
-  void readParameters(std::string filename);
   void testPrintParameters(void);
   void readData(std::string filename);
   void testPrintParticles(void);
@@ -115,3 +114,4 @@ class MolDy
   
 };
 
+#endif

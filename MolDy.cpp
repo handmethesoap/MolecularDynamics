@@ -5,134 +5,111 @@
 #include <fstream>
 #include <cmath>
 
-void MolDy::readParameters(std::string filename){
-  std::ifstream infile(filename.c_str());
-  if (infile.good()){
-      while (!infile.eof()){
-	  std::string line, param;
-	  std::stringstream ss;
-	  getline(infile,line);
-	  ss<<line;
-	  ss>>param;
-	  if (param == "name"){
-	      ss>>vtkfile;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'vis_space' in '"<<filename<<"'"<<std::endl;
-		  exit(-1);
-	      }
-	  }
-	  if (param == "vis_space"){
-	      ss>>vis_space;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'vis_space' in '"<<filename<<"'"<<std::endl;
-		  exit(-1);
-	      }
-	  }
-	  else if (param == "t_start"){
-	      ss>>t_start;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 't_start' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "t_end"){
-	      ss>>t_end;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 't_end' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "delta_t"){
-	      ss>>delta_t;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'delta_t' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "x_min"){
-	      ss>>x_min;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'x_min' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "y_min"){
-	      ss>>y_min;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'y_min' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "z_min"){
-	      ss>>z_min;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'z_min' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "x_max"){
-	      ss>>x_max;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'x_max' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "y_max"){
-	      ss>>y_max;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'y_max' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "z_max"){
-	      ss>>z_max;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'z_max' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "r_cut"){
-	      ss>>r_cut;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'r_cut' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "epsilon"){
-	      ss>>epsilon;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'epsilon' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-	  else if (param == "sigma"){
-	      ss>>sigma;
-	      if (ss.fail()){
-		  std::cerr<<"Error reading 'sigma' in '"<<filename<<"'"<<std::endl;
-		  return exit(-1);
-	      }
-	  }
-// 	  else if (param == "gravity"){
-// 	      ss>>gravity;
-// 	      if (ss.fail()){
-// 		  std::cerr<<"Error reading 'sigma' in '"<<filename<<"'"<<std::endl;
-// 		  return exit(-1);
-// 	      }
-// 	  }
-// 	  else if (param == "reflective_boundaries"){
-// 	      ss>>reflective_boundaries;
-// 	      if (ss.fail()){
-// 		  std::cerr<<"Error reading 'sigma' in '"<<filename<<"'"<<std::endl;
-// 		  return exit(-1);
-// 	      }
-// 	  }
-      }
-      infile.close();
+
+
+MolDy::MolDy(const ParameterReader& parameters){
+  if(parameters.IsDefined( "name"))
+  {
+    parameters.GetParameter("name", vtkfile);
   }
   else{
-      std::cerr<<"Error reading '"<<filename<<"'"<<std::endl;
-      return exit(-1);
+    std::cout << "error undefined variable vtkfile" << std::endl;
   }
+  if(parameters.IsDefined( "vis_space"))
+  {
+    parameters.GetParameter("vis_space", vis_space);
+  }
+  else{
+    std::cout << "error undefined variable vis_space" << std::endl;
+  }
+  if(parameters.IsDefined( "t_start"))
+  {
+    parameters.GetParameter("t_start", t_start);
+  }
+  else{
+    std::cout << "error undefined variable t_start" << std::endl;
+  }
+  if(parameters.IsDefined( "t_end"))
+  {
+    parameters.GetParameter("t_end", t_end);
+  }
+  else{
+    std::cout << "error undefined variable t_end" << std::endl;
+  }
+  if(parameters.IsDefined( "delta_t"))
+  {
+    parameters.GetParameter("delta_t", delta_t);
+  }
+  else{
+    std::cout << "error undefined variable delta_t" << std::endl;
+  }
+  if(parameters.IsDefined( "x_min"))
+  {
+    parameters.GetParameter("x_min", x_min);
+  }
+  else{
+    std::cout << "error undefined variable x_min" << std::endl;
+  }
+  if(parameters.IsDefined( "y_min"))
+  {
+    parameters.GetParameter("y_min", y_min);
+  }
+  else{
+    std::cout << "error undefined variable y_min" << std::endl;
+  }
+  if(parameters.IsDefined( "z_min"))
+  {
+    parameters.GetParameter("z_min", z_min);
+  }
+  else{
+    std::cout << "error undefined variable z_min" << std::endl;
+  }
+  if(parameters.IsDefined( "x_max"))
+  {
+    parameters.GetParameter("x_max", x_max);
+  }
+  else{
+    std::cout << "error undefined variable x_max" << std::endl;
+  }
+  if(parameters.IsDefined( "y_max"))
+  {
+    parameters.GetParameter("y_max", y_max);
+  }
+  else{
+    std::cout << "error undefined variable y_max" << std::endl;
+  }
+  if(parameters.IsDefined( "z_max"))
+  {
+    parameters.GetParameter("z_max", z_max);
+  }
+  else{
+    std::cout << "error undefined variable z_max" << std::endl;
+  }
+  if(parameters.IsDefined( "r_cut"))
+  {
+    parameters.GetParameter("r_cut", r_cut);
+  }
+  else{
+    std::cout << "error undefined variable r_cut" << std::endl;
+  }
+  if(parameters.IsDefined( "epsilon"))
+  {
+    parameters.GetParameter("epsilon", epsilon);
+  }
+  else{
+    std::cout << "error undefined variable epsilon" << std::endl;
+  }
+  if(parameters.IsDefined( "sigma"))
+  {
+    parameters.GetParameter("sigma", sigma);
+  }
+  else{
+    std::cout << "error undefined variable sigma" << std::endl;
+  }
+
+    gravity = 0.0;
+    reflective_boundaries = 0;
+    
 }
 
 void MolDy::testPrintParameters(void){
@@ -632,4 +609,10 @@ void MolDy::simulate(void){
     
     //std::cout << time << std::endl;
   }
+
+    std::stringstream filename;
+    filename << vtkfile << t_end/(delta_t*vis_space) << ".vtk";
+    VTKPrint(filename.str());
+    std::cout << filename.str() << std::endl;
+
 }

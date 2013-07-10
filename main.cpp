@@ -1,5 +1,6 @@
 #include "MolDy.h"
 #include <iostream>
+#include "ParameterReader.h"
 
 int main(int argc, char** argv)
 {
@@ -11,9 +12,11 @@ int main(int argc, char** argv)
   std::string parameterfile = argv[1];
   std::string datafile = argv[2];
   
-  MolDy particleSystem;
+  ParameterReader parameters;
+  parameters.readParameters(parameterfile);
   
-  particleSystem.readParameters(parameterfile);
+  MolDy particleSystem(parameters);
+  
   particleSystem.readData(datafile);
   particleSystem.simulate();
   return 0;
